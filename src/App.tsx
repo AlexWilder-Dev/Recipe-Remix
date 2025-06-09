@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import html2pdf from 'html2pdf.js'
+import clsx from 'clsx'
 
 export interface Recipe {
   title: string
@@ -18,6 +19,16 @@ function App() {
   const [query, setQuery] = useState('')
   const [recipes, setRecipes] = useState<Recipe[]>(defaultRecipes)
   const [loading, setLoading] = useState(false)
+  const [dark, setDark] = useState(false)
+
+  useEffect(() => {
+    const root = document.documentElement
+    if (dark) {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+  }, [dark])
 
   const fetchRecipes = async (prompt: string) => {
     setLoading(true)
@@ -71,61 +82,89 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen p-8 bg-gray-50">
-      <h1 className="text-3xl font-bold mb-4 text-center">Recipe Remix</h1>
-      <div className="flex mb-6 justify-center">
-        <input
-          type="text"
-          className="border p-2 rounded w-2/3 mr-2"
-          placeholder="chicken, rice, spinach"
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
-        <button onClick={handleSearch} className="bg-blue-500 text-white px-4 py-2 rounded">
-          Search
-        </button>
-      </div>
-      {loading && <p className="text-center">Loading...</p>}
-      <div className="grid gap-4 md:grid-cols-3">
-        {recipes.map((r, idx) => (
-          <div key={idx} className="bg-white shadow rounded p-4 flex flex-col">
-            <h2 className="text-xl font-semibold mb-2">{r.title}</h2>
-            <p className="mb-2">{r.description}</p>
-            <h3 className="font-semibold">Ingredients</h3>
-            <ul className="list-disc list-inside mb-2">
-              {r.ingredients.map((ing, i) => (
-                <li key={i}>{ing}</li>
-              ))}
-            </ul>
-            <h3 className="font-semibold">Steps</h3>
-            <ol className="list-decimal list-inside mb-4">
-              {r.steps.map((step, i) => (
-                <li key={i}>{step}</li>
-              ))}
-            </ol>
-            <div className="mt-auto flex space-x-2">
-              <button
-                onClick={() => fetchRecipes(`${query} but spicier`)}
-                className="bg-orange-500 text-white px-2 py-1 rounded"
-              >
-                Remix
-              </button>
-              <button
-                onClick={() => saveRecipe(r)}
-                className="bg-green-600 text-white px-2 py-1 rounded"
-              >
-                Save to Cookbook
-              </button>
-              <button
-                onClick={() => downloadRecipe(r)}
-                className="bg-gray-700 text-white px-2 py-1 rounded"
-              >
-                Download as PDF
-              </button>
+    <div className="min-h-screen flex flex-col">
+      <header className="sticky top-0 z-10 bg-white/90 dark:bg-gray-900/90 backdrop-blur shadow-sm">
+        <div className="max-w-4xl mx-auto flex items-center justify-between px-4 py-4">
+          <h1 className="text-2xl font-bold text-primary">Recipe Remix</h1>
+          <button
+            onClick={() => setDark(d => !d)}
+            className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+          >
+            {dark ? '🌙' : '☀️'}
+          </button>
+        </div>
+      </header>
+      <main className="flex-1 p-4 sm:p-8 max-w-4xl mx-auto w-full">
+        <div className="relative mb-8">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <input
+            type="text"
+            className="w-full pl-10 pr-28 py-3 rounded-full shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/60 transition"
+            placeholder="Type ingredients to inspire recipes..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          <button
+            onClick={handleSearch}
+            disabled={!query || loading}
+            className={clsx(
+              'absolute right-1 top-1/2 -translate-y-1/2 px-4 py-2 rounded-full text-white bg-gradient-to-r from-primary to-accent shadow hover:shadow-lg transition',
+              (!query || loading) && 'opacity-50 cursor-not-allowed'
+            )}
+          >
+            Search
+          </button>
+        </div>
+        {loading && <p className="text-center">Loading...</p>}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {recipes.map((r, idx) => (
+            <div key={idx} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 flex flex-col animate-fade hover:shadow-2xl transition">
+              <h2 className="text-xl font-semibold mb-2 text-primary">{r.title}</h2>
+              <p className="mb-2 text-sm">{r.description}</p>
+              <h3 className="font-semibold">Ingredients</h3>
+              <ul className="mb-2 space-y-1">
+                {r.ingredients.map((ing, i) => (
+                  <li key={i} className="flex items-start"><span className="mr-2">🥕</span>{ing}</li>
+                ))}
+              </ul>
+              <h3 className="font-semibold">Steps</h3>
+              <ol className="list-decimal list-inside mb-4 space-y-1">
+                {r.steps.map((step, i) => (
+                  <li key={i}>{step}</li>
+                ))}
+              </ol>
+              <div className="mt-auto flex space-x-2">
+                <button
+                  onClick={() => fetchRecipes(`${query} but spicier`)}
+                  className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-3 py-1 rounded-full shadow hover:shadow-md transition-transform hover:-translate-y-0.5"
+                >
+                  Remix
+                </button>
+                <button
+                  onClick={() => saveRecipe(r)}
+                  className="bg-green-600 text-white px-3 py-1 rounded-full shadow hover:shadow-md"
+                >
+                  Save
+                </button>
+                <button
+                  onClick={() => downloadRecipe(r)}
+                  className="bg-gray-700 text-white px-3 py-1 rounded-full shadow hover:shadow-md"
+                >
+                  PDF
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </main>
+      {!loading && query && (
+        <button
+          onClick={() => fetchRecipes(`${query} with a twist`)}
+          className="fixed bottom-6 right-6 bg-gradient-to-r from-primary to-accent text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-transform hover:-translate-y-1"
+        >
+          🔀
+        </button>
+      )}
     </div>
   )
 }
