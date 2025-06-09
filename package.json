@@ -10,7 +10,8 @@
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "html2pdf.js": "^0.9.3"
+    "html2pdf.js": "^0.9.3",
+    "clsx": "^1.2.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.6",
