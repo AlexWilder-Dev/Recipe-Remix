@@ -31,6 +31,7 @@ function App() {
   }, [dark])
 
   const fetchRecipes = async (prompt: string) => {
+    if (loading) return
     setLoading(true)
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -59,7 +60,7 @@ function App() {
   }
 
   const handleSearch = () => {
-    if (!query) return
+    if (!query || loading) return
     fetchRecipes(query)
   }
 
@@ -136,7 +137,11 @@ function App() {
               <div className="mt-auto flex space-x-2">
                 <button
                   onClick={() => fetchRecipes(`${query} but spicier`)}
-                  className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-3 py-1 rounded-full shadow hover:shadow-md transition-transform hover:-translate-y-0.5"
+                  disabled={loading}
+                  className={clsx(
+                    'bg-gradient-to-r from-orange-400 to-pink-500 text-white px-3 py-1 rounded-full shadow hover:shadow-md transition-transform hover:-translate-y-0.5',
+                    loading && 'opacity-50 cursor-not-allowed'
+                  )}
                 >
                   Remix
                 </button>
