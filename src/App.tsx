@@ -95,7 +95,7 @@ function App() {
         </div>
       </header>
       <main className="flex-1 p-4 sm:p-8 max-w-4xl mx-auto w-full">
-        <div className="relative mb-8">
+        <div className="relative mb-8 max-w-xl mx-auto">
           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input
             type="text"
