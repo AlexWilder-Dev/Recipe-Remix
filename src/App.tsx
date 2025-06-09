@@ -88,6 +88,7 @@ function App() {
           <h1 className="text-2xl font-bold text-primary">Recipe Remix</h1>
           <button
             onClick={() => setDark(d => !d)}
+            aria-label="Toggle dark mode"
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition"
           >
             {dark ? '🌙' : '☀️'}
@@ -96,8 +97,10 @@ function App() {
       </header>
       <main className="flex-1 p-4 sm:p-8 max-w-4xl mx-auto w-full">
         <div className="relative mb-8 max-w-xl mx-auto">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+          <label htmlFor="search" className="sr-only">Search recipes</label>
+          <span aria-hidden="true" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
           <input
+            id="search"
             type="text"
             className="w-full pl-10 pr-28 py-3 rounded-full shadow-inner focus:outline-none focus:ring-2 focus:ring-primary/60 transition"
             placeholder="Type ingredients to inspire recipes..."
@@ -106,6 +109,7 @@ function App() {
           />
           <button
             onClick={handleSearch}
+            aria-label="Search recipes"
             disabled={!query || loading}
             className={clsx(
               'absolute right-1 top-1/2 -translate-y-1/2 px-4 py-2 rounded-full text-white bg-gradient-to-r from-primary to-accent shadow hover:shadow-lg transition',
@@ -115,8 +119,8 @@ function App() {
             Search
           </button>
         </div>
-        {loading && <p className="text-center">Loading...</p>}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {loading && <p role="status" aria-live="polite" className="text-center">Loading...</p>}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-live="polite">
           {recipes.map((r, idx) => (
             <div key={idx} className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 flex flex-col animate-fade hover:shadow-2xl transition">
               <h2 className="text-xl font-semibold mb-2 text-primary">{r.title}</h2>
@@ -124,7 +128,7 @@ function App() {
               <h3 className="font-semibold">Ingredients</h3>
               <ul className="mb-2 space-y-1">
                 {r.ingredients.map((ing, i) => (
-                  <li key={i} className="flex items-start"><span className="mr-2">🥕</span>{ing}</li>
+                  <li key={i} className="flex items-start"><span className="mr-2" aria-hidden="true">🥕</span>{ing}</li>
                 ))}
               </ul>
               <h3 className="font-semibold">Steps</h3>
@@ -136,18 +140,21 @@ function App() {
               <div className="mt-auto flex space-x-2">
                 <button
                   onClick={() => fetchRecipes(`${query} but spicier`)}
+                  aria-label="Remix recipe"
                   className="bg-gradient-to-r from-orange-400 to-pink-500 text-white px-3 py-1 rounded-full shadow hover:shadow-md transition-transform hover:-translate-y-0.5"
                 >
                   Remix
                 </button>
                 <button
                   onClick={() => saveRecipe(r)}
+                  aria-label="Save recipe"
                   className="bg-green-600 text-white px-3 py-1 rounded-full shadow hover:shadow-md"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => downloadRecipe(r)}
+                  aria-label="Download recipe as PDF"
                   className="bg-gray-700 text-white px-3 py-1 rounded-full shadow hover:shadow-md"
                 >
                   PDF
@@ -160,9 +167,10 @@ function App() {
       {!loading && query && (
         <button
           onClick={() => fetchRecipes(`${query} with a twist`)}
+          aria-label="Remix all recipes"
           className="fixed bottom-6 right-6 bg-gradient-to-r from-primary to-accent text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-transform hover:-translate-y-1"
         >
-          🔀
+          <span aria-hidden="true">🔀</span>
         </button>
       )}
     </div>
